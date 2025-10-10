@@ -1,9 +1,10 @@
 import type { INodeProperties } from "n8n-workflow";
 
-// const showOnlyForDocumentsGetMany = {
-//     operation: ['getAll'],
-//     resource: ['documents'],
-// };
+const displayOptionsDocuments = {
+    resource: ['documents'],
+    operation: ['getAll']
+}
+
 
 export const documentsGetManyDescription: INodeProperties[] = [
     {
@@ -11,6 +12,11 @@ export const documentsGetManyDescription: INodeProperties[] = [
         name: 'orgId',
         type: 'string',
         default: '',
+        displayOptions: {
+            show: {
+                ...displayOptionsDocuments
+            }
+        },
         description: "The organization's ID to retrieve",
         routing: {
             send: {
@@ -26,6 +32,11 @@ export const documentsGetManyDescription: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add option',
 		default: {},
+         displayOptions: {
+            show: {
+                ...displayOptionsDocuments
+            }
+        },
 		options: [
             {
                 displayName: 'Type',
@@ -82,3 +93,4 @@ export const documentsGetManyDescription: INodeProperties[] = [
         ],
     },
 ]
+
