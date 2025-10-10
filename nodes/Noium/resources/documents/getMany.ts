@@ -14,8 +14,8 @@ export const documentsGetManyDescription: INodeProperties[] = [
         default: '',
         displayOptions: {
             show: {
-                ...displayOptionsDocuments
-            }
+                ...displayOptionsDocuments,
+            },
         },
         description: "The organization's ID to retrieve",
         routing: {
@@ -34,8 +34,8 @@ export const documentsGetManyDescription: INodeProperties[] = [
 		default: {},
          displayOptions: {
             show: {
-                ...displayOptionsDocuments
-            }
+                ...displayOptionsDocuments,
+            },
         },
 		options: [
             {
@@ -47,9 +47,9 @@ export const documentsGetManyDescription: INodeProperties[] = [
                 routing: {
                     send: {
                         type:'body',
-                        property: 'type'
-                    }
-                }
+                        property: 'type',
+                    },
+                },
             },
             {
                 displayName: 'Category',
@@ -60,9 +60,9 @@ export const documentsGetManyDescription: INodeProperties[] = [
                 routing: {
                     send: {
                         type: 'body',
-                        property: 'category'
-                    }
-                }
+                        property: 'category',
+                    },
+                },
             },
             {
                 displayName: 'Created To',
@@ -73,8 +73,8 @@ export const documentsGetManyDescription: INodeProperties[] = [
                 routing: {
                     send: {
                         type: 'body',
-                        property: 'createdTo'
-                    }
+                        property: 'createdTo',
+                    },
                 },
             },
             {
@@ -86,8 +86,8 @@ export const documentsGetManyDescription: INodeProperties[] = [
                 routing: {
                     send: {
                         type: 'body',
-                        property: 'createdFrom'
-                    }
+                        property: 'createdFrom',
+                    },
                 },
             },
         ],
