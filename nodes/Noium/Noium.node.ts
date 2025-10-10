@@ -1,6 +1,7 @@
-import { NodeConnectionType, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
+import { type INodeType, type INodeTypeDescription } from 'n8n-workflow';
 import { userDescription } from './resources/user';
 import { companyDescription } from './resources/company';
+import { documentsDescription } from './resources/documents';
 
 export class Noium implements INodeType {
 	description: INodeTypeDescription = {
@@ -15,8 +16,8 @@ export class Noium implements INodeType {
 			name: 'Noium',
 		},
 		usableAsTool: true,
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [{ name: 'noiumApi', required: true }],
 		requestDefaults: {
 			baseURL: 'https://operations.noium.com/webhook/api',
@@ -40,11 +41,16 @@ export class Noium implements INodeType {
 						name: 'Company',
 						value: 'company',
 					},
+					{
+						name: 'Document',
+						value: 'documents',
+					}
 				],
 				default: 'user',
 			},
 			...userDescription,
 			...companyDescription,
+			...documentsDescription
 		],
 	};
 }

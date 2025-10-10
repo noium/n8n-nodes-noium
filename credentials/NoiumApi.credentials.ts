@@ -1,6 +1,6 @@
 import type {
 	IAuthenticateGeneric,
-	ICredentialTestRequest,
+	// ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -28,15 +28,15 @@ export class NoiumApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				'x-api-key': '={{$credentials.apiKey}}',
+				'Authorization': '={{$credentials.apiKey}}',
 			},
 		},
 	};
 
-	test: ICredentialTestRequest = {
-		request: {
-			baseURL: 'https://operations.noium.com/webhook/api',
-			url: '/v1/user',
-		},
-	};
+	// test: ICredentialTestRequest = {
+	// 	request: {
+	// 		baseURL: 'https://operations.noium.com/webhook/api',
+	// 		url: '/client',
+	// 	},
+	// };
 }
