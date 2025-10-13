@@ -20,11 +20,15 @@ export const documentsDescription: INodeProperties[] = [
                 name: 'Get Many',
                 value: 'getAll',
                 action: 'Get documents',
-                description: 'Get companies',
+                description: 'Get documents',
                 routing: {
                     request: {
-                        method: 'GET',
-                        url: '/documents'
+                        method: 'POST',
+                        url: '/documents',
+                        headers: {
+                            'Content-type': 'application/json',
+
+                        },
                     },
                 },
 
@@ -36,8 +40,14 @@ export const documentsDescription: INodeProperties[] = [
                 description: 'Get a single document',
                 routing: {
                     request: {
-                        method: 'GET',
+                        method: 'POST',
                         url: '/document',
+                        headers: {
+                            'X-HTTP-Method-Override': 'GET',
+                            'Content-type': 'application/json',
+                        },
+                        qs: {organization_id:'={{ $parameter.orgId }}'},
+
                     },
                 },
             },

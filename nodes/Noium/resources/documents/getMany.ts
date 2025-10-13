@@ -9,7 +9,7 @@ const displayOptionsDocuments = {
 export const documentsGetManyDescription: INodeProperties[] = [
     {
         displayName: 'Organization ID',
-        name: 'orgId',
+        name: 'organization_id',
         type: 'string',
         default: '',
         displayOptions: {
@@ -20,11 +20,10 @@ export const documentsGetManyDescription: INodeProperties[] = [
         description: "The organization's ID to retrieve",
         routing: {
             send: {
-                type: 'query',
-                property: 'orgId',
-            }
-        }
-        
+                type:  'query',
+                property: 'organization_id',
+            },
+        },
     },
     {
         displayName: 'Options',
@@ -46,7 +45,7 @@ export const documentsGetManyDescription: INodeProperties[] = [
                 description: "The type of the document to recieve",
                 routing: {
                     send: {
-                        type:'body',
+                        type: 'body',
                         property: 'type',
                     },
                 },
@@ -66,31 +65,30 @@ export const documentsGetManyDescription: INodeProperties[] = [
             },
             {
                 displayName: 'Created To',
-                name: 'createdTo',
-                type: 'dateTime',
+                name: 'created_to',
+                type: 'string', //chose string because the date picker kept keeping the hours
                 default: '',
-                description: 'The date to which the document could have been created',
+                description: 'Enter the date in the yyyy-MM-dd format',
                 routing: {
                     send: {
                         type: 'body',
-                        property: 'createdTo',
+                        property: 'created_to',
                     },
                 },
             },
             {
                 displayName: 'Created From',
-                name: 'createdFrom',
-                type: 'dateTime',
+                name: 'created_from',
+                type: 'string', //chose string because the date picker kept keeping the hours
                 default: '',
-                description: 'The date from which the document could have been created',
+                description: 'Enter the date in the yyyy-MM-dd format',
                 routing: {
                     send: {
                         type: 'body',
-                        property: 'createdFrom',
+                        property: 'created_from',
                     },
                 },
             },
         ],
     },
 ]
-
