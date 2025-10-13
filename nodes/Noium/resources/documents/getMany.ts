@@ -14,7 +14,7 @@ export const documentsGetManyDescription: INodeProperties[] = [
         default: '',
         displayOptions: {
             show: {
-                ...displayOptionsDocuments,
+                resource: ['documents'] //show to documentsGet as well
             },
         },
         description: "The organization's ID to retrieve",
