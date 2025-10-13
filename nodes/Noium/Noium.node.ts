@@ -1,7 +1,6 @@
 import { type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { userDescription } from './resources/user';
-import { companyDescription } from './resources/company';
 import { documentsDescription } from './resources/documents';
+import { clientsDescription } from './resources/clients';
 
 export class Noium implements INodeType {
 	description: INodeTypeDescription = {
@@ -34,23 +33,18 @@ export class Noium implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'User',
-						value: 'user',
-					},
-					{
-						name: 'Company',
-						value: 'company',
-					},
-					{
 						name: 'Document',
 						value: 'documents',
+					},
+					{
+						name: 'Client',
+						value: 'clients',
 					}
 				],
-				default: 'user',
+				default: 'clients',
 			},
-			...userDescription,
-			...companyDescription,
-			...documentsDescription
+			...documentsDescription,
+			...clientsDescription
 		],
 	};
 }
