@@ -1,5 +1,6 @@
 import type { INodeProperties } from "n8n-workflow";
 import { documentsGetManyDescription } from "./getMany";
+import { documentsGetDescription } from "./get";
 
 const showOnlyForDocuments = {
     resource: ['documents'],
@@ -43,7 +44,6 @@ export const documentsDescription: INodeProperties[] = [
                         method: 'POST',
                         url: '/document',
                         headers: {
-                            'X-HTTP-Method-Override': 'GET',
                             'Content-type': 'application/json',
                         },
                         qs: {organization_id:'={{ $parameter.orgId }}'},
@@ -53,5 +53,7 @@ export const documentsDescription: INodeProperties[] = [
             },
         ],
     },
-    ...documentsGetManyDescription
+    ...documentsGetManyDescription,
+    ...documentsGetDescription
+    
 ]

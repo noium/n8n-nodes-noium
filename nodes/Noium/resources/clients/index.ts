@@ -18,7 +18,7 @@ export const clientsDescription: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get client',
+				action: 'Get clients',
 				description: 'Retrieve client information',
 				routing: {
 					request: {
