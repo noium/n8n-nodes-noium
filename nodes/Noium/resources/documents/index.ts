@@ -1,6 +1,7 @@
 import type { INodeProperties } from "n8n-workflow";
 import { documentsGetManyDescription } from "./getMany";
 import { documentsGetDescription } from "./get";
+import { documentsGetParsedDescription } from "./getParsed";
 
 const showOnlyForDocuments = {
     resource: ['documents'],
@@ -39,6 +40,9 @@ export const documentsDescription: INodeProperties[] = [
                 value: 'get',
                 action: 'Get a document',
                 description: 'Get a single document',
+                displayOptions: {
+                   show: showOnlyForDocuments,
+                },
                 routing: {
                     request: {
                         method: 'POST',
@@ -51,9 +55,31 @@ export const documentsDescription: INodeProperties[] = [
                     },
                 },
             },
+            {
+                name: 'Get Parsed',
+                value: 'getParsed',
+                action: 'Get a parsed document',
+                description: 'Get the raw text of a document',
+                displayOptions: {
+                   show: {
+                    ...showOnlyForDocuments,
+                   }
+                },
+                routing: {
+                    request: {
+                        method: 'POST',
+                        url: '/document-parsed',
+                        headers: {
+                            'Content-type': 'application/json',
+                        },
+                        
+                    }
+                }
+            }
         ],
     },
     ...documentsGetManyDescription,
-    ...documentsGetDescription
+    ...documentsGetDescription,
+    ...documentsGetParsedDescription
     
 ]

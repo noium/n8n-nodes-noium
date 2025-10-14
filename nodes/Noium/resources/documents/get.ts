@@ -7,6 +7,25 @@ const displayOptionsDocumentsGet = {
 
 export const documentsGetDescription: INodeProperties[] = [
     {
+        displayName: 'Organization ID',
+        name: 'organization_id',
+        type: 'string',
+        default: '',
+        displayOptions: {
+            show: {
+                ...displayOptionsDocumentsGet
+            },
+        },
+        description: "The organization's ID to retrieve",
+        routing: {
+            send: {
+                type:  'query',
+                property: 'organization_id',
+            },
+        },
+    },
+    
+    {
         displayName: 'Document ID',
         name: 'document_id',
         type: 'string',
@@ -19,7 +38,7 @@ export const documentsGetDescription: INodeProperties[] = [
         description: "The document's ID to retrieve",
         routing: {
             send: {
-                type: 'body',
+                type: 'query',
                 property: 'document_id'
             }
         }
