@@ -1,6 +1,7 @@
 import { type INodeType, type INodeTypeDescription } from 'n8n-workflow';
 import { documentsDescription } from './resources/documents';
 import { clientsDescription } from './resources/clients';
+import { emailsDescription } from './resources/emails';
 
 export class Noium implements INodeType {
 	description: INodeTypeDescription = {
@@ -39,12 +40,17 @@ export class Noium implements INodeType {
 					{
 						name: 'Client',
 						value: 'clients',
+					},
+					{
+						name: 'Email',
+						value: 'emails'
 					}
 				],
 				default: 'clients',
 			},
 			...documentsDescription,
-			...clientsDescription
+			...clientsDescription,
+			...emailsDescription
 		],
 	};
 }
