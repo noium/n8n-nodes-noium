@@ -27,23 +27,32 @@ export const documentsGetParsedDescription: INodeProperties[] = [
 
     },
     {
-        displayName: 'Type',
-        name: 'type',
-        type: 'string',
-        default: '',
-        displayOptions: {
+        displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add option',
+		default: {},
+         displayOptions: {
             show: {
-                ...displayOptionsDocumentsParsed
+                ...displayOptionsDocumentsParsed,
             },
         },
-        description: 'The type of document to retrieve',
-        routing: {
-            send: {
-                type: 'body',
-                property: 'type'
-            }
-        }
-    }
+		options: [
+            {
+                displayName: 'Type',
+                name: 'type',
+                type: 'string',
+                default: '',
+                description: "The type of the document to recieve",
+                routing: {
+                    send: {
+                        type: 'body',
+                        property: 'type',
+                    },
+                },
+            },
+        ], 
+    },
     
     
 ]

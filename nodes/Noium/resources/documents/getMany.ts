@@ -12,6 +12,7 @@ export const documentsGetManyDescription: INodeProperties[] = [
         name: 'organization_id',
         type: 'string',
         default: '',
+        required: true,
         displayOptions: {
             show: {
                 ...displayOptionsDocuments

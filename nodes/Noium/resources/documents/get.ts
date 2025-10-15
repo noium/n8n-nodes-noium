@@ -11,6 +11,7 @@ export const documentsGetDescription: INodeProperties[] = [
         name: 'organization_id',
         type: 'string',
         default: '',
+        required : true,
         displayOptions: {
             show: {
                 ...displayOptionsDocumentsGet
@@ -25,23 +26,34 @@ export const documentsGetDescription: INodeProperties[] = [
         },
     },
     
+    
+    
     {
-        displayName: 'Document ID',
-        name: 'document_id',
-        type: 'string',
-        default: '',
-        displayOptions: {
+        displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add option',
+		default: {},
+         displayOptions: {
             show: {
-                ...displayOptionsDocumentsGet
-            }
+                ...displayOptionsDocumentsGet,
+            },
         },
-        description: "The document's ID to retrieve",
-        routing: {
-            send: {
-                type: 'query',
-                property: 'document_id'
-            }
-        }
-
-    }
+		options: [
+            {
+                displayName: 'Type',
+                name: 'type',
+                type: 'string',
+                default: '',
+                description: "The type of the document to recieve",
+                routing: {
+                    send: {
+                        type: 'body',
+                        property: 'type',
+                    },
+                },
+            },
+        ], 
+    },
+    
 ]

@@ -11,6 +11,7 @@ export const emailsGetDescription : INodeProperties [] = [
         name: 'email_id',
         type: 'string',
         default: '',
+        required: true,
         displayOptions: {
             show: {
                 ...displayOptionsEmailsGet
