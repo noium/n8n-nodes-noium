@@ -9,7 +9,6 @@ n8n community node for the Noium Operations API. It provides resources to list a
 - [Operations](#operations)
 - [Usage](#usage)
 - [Compatibility](#compatibility)
-- [Development](#development)
 - [Troubleshooting](#troubleshooting)
 - [Version history](#version-history)
 
