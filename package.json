@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "n8n community node to work with the Example API",
   "license": "MIT",
-  "homepage": "https://example.com",
+  "homepage": "https://noium.lt",
   "keywords": ["n8n-community-node-package"],
   "author": { "name": "neapykanta", "email": "ignasijusx@gmail.com" },
-  "repository": { "type": "git", "url": "" },
+  "repository": { "type": "git", "url": "https://github.com/noium/n8n-nodes-noium" },
   "scripts": {
     "build": "n8n-node build",
     "build:watch": "tsc --watch",
