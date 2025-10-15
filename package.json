@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-noium",
   "version": "1.0.0",
-  "description": "n8n community node to work with the Example API",
+  "description": "n8n community node to work with the Noium API",
   "license": "MIT",
   "homepage": "https://noium.lt",
   "keywords": [
