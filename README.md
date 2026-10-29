@@ -47,7 +47,7 @@ Tested with n8n 2.45. Requires n8n 1.0 or later.
 
 ## Usage
 
-**Upload files from another app.** Add a node that outputs a file as binary data (for example Gmail, Google Drive, or **Read/Write Files from Disk**), then a Noium node with **Upload**. Set **Input Binary Field** to the field holding the file (usually `data`). The output is the new document, including its `id`.
+**Upload files from another app.** Add a node that outputs a file as binary data (for example Gmail, Google Drive, or **Read/Write Files from Disk**), then a Noium node with **Upload**. Set **Input Binary Field** to the field holding the file (usually `data`). The output is the new document, including its `id`. If an input item has no file in that field, or the file is empty, the node stops before calling Noium and its error lists the binary fields the item does have (an email trigger names them `attachment_0`, `attachment_1`, …).
 
 **Get a document and its file.** Use **Get** with the document's ID, for example `{{ $json.id }}` after an upload. Turn on **Download File** to pass the file on to the next node.
 
