@@ -24,7 +24,7 @@
 #        Repository owner: <your-github-username-or-org>
 #        Repository name:  <your-repo-name>
 #        Workflow name:    publish.yml
-#        Environment:      (leave blank unless you use GitHub Environments)
+#        Environment:      noium (matches `environment:` on the publish job)
 #   4. Leave the NPM_TOKEN secret unset in this repository. GitHub's OIDC
 #      token is used instead — no secret ever touches your repo settings.
 #
@@ -65,6 +65,10 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    # Must match the Environment set on the npm trusted publisher for this package.
+    # GitHub creates the environment on the first run; add protection rules
+    # (e.g. required reviewers) under Settings → Environments → noium.
+    environment: noium
 
     permissions:
       # Required to mint an OIDC token for npm provenance attestation.
