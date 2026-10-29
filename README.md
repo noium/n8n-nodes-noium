@@ -1,103 +1,65 @@
 # n8n-nodes-noium
 
-n8n community node for the Noium Operations API. It provides resources to list and retrieve Clients, Documents, and Emails from Noium, including fetching parsed document text.
+This is an n8n community node for [Noium](https://noium.com). It uploads documents to your Noium organization and gets them back, with their files, in your n8n workflows.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
 - [Installation](#installation)
-- [Credentials](#credentials)
 - [Operations](#operations)
-- [Usage](#usage)
+- [Credentials](#credentials)
 - [Compatibility](#compatibility)
-- [Troubleshooting](#troubleshooting)
+- [Usage](#usage)
+- [Resources](#resources)
 - [Version history](#version-history)
-
----
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
-
-
-## Credentials
-
-This node uses an API key for authentication via the `Authorization` header.
-
-The authorization key is unique to each organization; each organization requires its own "Noium account" credentials in n8n. 
-
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation. The package name is `n8n-nodes-noium`.
 
 ## Operations
 
-This node exposes three resources: Clients, Documents, and Emails.
+The node works with the [Noium API](https://api.noium.com/docs).
 
-### Clients
+### Document
 
-- Get (GET `/client`)
-  - Returns client information for the authenticated organization.
-  - Parameters: none.
+| Operation  | What it does                                                                                                                                                     | API endpoint                     | API key scope      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------ |
+| **Upload** | Creates a document in your organization from a file in the input item's binary data. You can set the document's type and category, and override its file name.   | `POST /v1/documents`             | `documents:upload` |
+| **Get**    | Returns a document by ID, including a download link that expires after 5 minutes. Turn on **Download File** to add the file itself to the output as binary data. | `GET /v1/documents/{documentId}` | `documents:get`    |
 
-### Documents
+Uploaded files can be up to 40 MB.
 
-- Get Many (POST `/documents`)
-  - Query:
-    - `organization_id` (string, required)
-  - Body options (all optional):
-    - `type` (string)
-    - `category` (string)
-    - `created_to` (string, format `yyyy-MM-dd`)
-    - `created_from` (string, format `yyyy-MM-dd`)
+## Credentials
 
-- Get (POST `/document`)
-  - Query:
-    - `organization_id` (string, required)
-  - Body options (optional):
-    - `type` (string)
+The node authenticates with a Noium API key, sent as `Authorization: Bearer <key>`.
 
-- Get Parsed (POST `/document-parsed`)
-  - Query:
-    - `document_id` (string, required)
-  - Body options (optional):
-    - `type` (string)
+1. In Noium, open **Organization settings → API keys** (organization owners and admins only) and create a key.
+2. Give it the scopes for the operations you will use: `documents:upload` and `documents:get`. Add `organization:get` too if you want n8n's **Test** button to confirm the key works.
+3. In n8n, create a **Noium API** credential and paste the key. The key is shown only once; if you lose it, revoke it and create a new one.
 
-### Emails
+Each key belongs to one organization, so create one credential per Noium organization.
 
-- Get Many (GET `/emails`)
-  - Query options (all optional unless noted):
-    - `received_from` (string)
-    - `received_to` (string)
-    - `has_documents` (boolean)
-    - `include_parent_with_childs` (boolean)
-    - `include_type` (string)
-
-- Get (GET `/email`)
-  - Query:
-    - `email_id` (string, required)
-  - Additional query options (optional):
-    - `has_documents` (boolean)
-    - `include_parent_with_childs` (boolean)
-    - `include_type` (string)
-
-## Usage
-
-- Add the Noium node to your workflow, choose a Resource and Operation, and set the required parameters.
-- Attach “Noium API” credentials to the node.
-- For date filters, use `yyyy-MM-dd` to match the API expectations.
-- The node sets `Accept: application/json` and `Content-Type: application/json` by default.
-
+Leave **Base URL** as `https://api.noium.com` unless Noium has given you another environment to use.
 
 ## Compatibility
 
-- n8n: 1.0+ (Community Nodes)
-- Node CLI: `@n8n/node-cli` used for build/dev
+Tested with n8n 2.45. Requires n8n 1.0 or later.
 
+## Usage
 
-## Troubleshooting
+**Upload files from another app.** Add a node that outputs a file as binary data (for example Gmail, Google Drive, or **Read/Write Files from Disk**), then a Noium node with **Upload**. Set **Input Binary Field** to the field holding the file (usually `data`). The output is the new document, including its `id`.
 
-- 401/403 errors: verify the `Authorization` value in credentials (include `Bearer ` if required by your key format).
-- Empty or unexpected results: confirm required query parameters like `organization_id`, `email_id`, or `document_id` are set.
-- Date filters: ensure `created_from`/`created_to` use `yyyy-MM-dd`.
+**Get a document and its file.** Use **Get** with the document's ID, for example `{{ $json.id }}` after an upload. Turn on **Download File** to pass the file on to the next node.
+
+Errors come from the Noium API with a stable code and message, for example `INSUFFICIENT_SCOPE` when the API key lacks a scope or `NOT_FOUND` for an unknown document ID. The API allows 600 requests per minute per key.
+
+## Resources
+
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [Noium API reference](https://api.noium.com/docs)
 
 ## Version history
 
-- 0.1.0 — Initial release with Clients (Get), Documents (Get, Get Many, Get Parsed), and Emails (Get, Get Many).
-
+- **2.0.0**: Rebuilt on the Noium public API (`https://api.noium.com/v1`) with Bearer API keys. Operations: Document → Upload and Get, with optional file download. Removed the earlier Client, Document and Email operations, which used the old operations API. Existing **Noium API** credentials need a new API key.
+- **1.0.1**: Description change.
+- **1.0.0**: Initial release with Clients (Get), Documents (Get, Get Many, Get Parsed) and Emails (Get, Get Many).

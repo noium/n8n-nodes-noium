@@ -1,6 +1,7 @@
 import type {
 	IAuthenticateGeneric,
-	// ICredentialTestRequest,
+	Icon,
+	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -10,8 +11,12 @@ export class NoiumApi implements ICredentialType {
 
 	displayName = 'Noium API';
 
-	// Link to your community node's README
-	documentationUrl = 'https://github.com/org/-noium?tab=readme-ov-file#credentials';
+	icon: Icon = {
+		light: 'file:../nodes/Noium/noium.svg',
+		dark: 'file:../nodes/Noium/noium.dark.svg',
+	};
+
+	documentationUrl = 'https://github.com/noium/n8n-nodes-noium?tab=readme-ov-file#credentials';
 
 	properties: INodeProperties[] = [
 		{
@@ -21,6 +26,16 @@ export class NoiumApi implements ICredentialType {
 			typeOptions: { password: true },
 			required: true,
 			default: '',
+			description:
+				'Create a key in Noium under Organization settings → API keys. Give it the documents:upload and documents:get scopes, plus organization:get to test the connection.',
+		},
+		{
+			displayName: 'Base URL',
+			name: 'baseUrl',
+			type: 'string',
+			required: true,
+			default: 'https://api.noium.com',
+			description: 'Change only to connect to a non-production Noium environment',
 		},
 	];
 
@@ -28,15 +43,32 @@ export class NoiumApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				'Authorization': '={{$credentials.apiKey}}',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
 			},
 		},
 	};
 
-	// test: ICredentialTestRequest = {
-	// 	request: {
-	// 		baseURL: 'https://operations.noium.com/webhook/api',
-	// 		url: '/client',
-	// 	},
-	// };
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.baseUrl.replace(/\\/+$/, "")}}',
+			url: '/v1/organization',
+		},
+		rules: [
+			{
+				type: 'responseCode',
+				properties: {
+					value: 401,
+					message: 'The API key is invalid or has been revoked',
+				},
+			},
+			{
+				type: 'responseCode',
+				properties: {
+					value: 403,
+					message:
+						'The API key is valid but lacks the organization:get scope used to test it. You can still save and use it.',
+				},
+			},
+		],
+	};
 }
