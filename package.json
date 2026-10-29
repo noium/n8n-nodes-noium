@@ -1,11 +1,15 @@
 {
   "name": "n8n-nodes-noium",
   "version": "1.0.1",
-  "description": "n8n community node to work with the Noium API",
+  "description": "n8n community node for Noium: upload documents and get them back with their files",
   "license": "MIT",
-  "homepage": "https://noium.lt",
+  "homepage": "https://github.com/noium/n8n-nodes-noium#readme",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "n8n",
+    "noium",
+    "documents",
+    "accounting"
   ],
   "author": {
     "name": "neapykanta",
@@ -13,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/noium/n8n-nodes-noium"
+    "url": "git+https://github.com/noium/n8n-nodes-noium.git"
   },
   "scripts": {
     "build": "n8n-node build",
@@ -29,6 +33,7 @@
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
+    "strict": true,
     "credentials": [
       "dist/credentials/NoiumApi.credentials.js"
     ],
@@ -37,10 +42,10 @@
     ]
   },
   "devDependencies": {
-    "@n8n/node-cli": "*",
+    "@n8n/node-cli": "^0.54.4",
     "eslint": "9.32.0",
     "prettier": "3.6.2",
-    "release-it": "^19.0.4",
+    "release-it": "^21.1.0",
     "typescript": "5.9.2"
   },
   "peerDependencies": {
