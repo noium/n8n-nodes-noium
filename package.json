@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-noium",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "n8n community node for Noium: upload documents and get them back with their files",
   "license": "MIT",
   "homepage": "https://github.com/noium/n8n-nodes-noium#readme",
@@ -12,8 +12,8 @@
     "accounting"
   ],
   "author": {
-    "name": "neapykanta",
-    "email": "ignasijusx@gmail.com"
+    "name": "Noium",
+    "email": "accounts@noium.com"
   },
   "repository": {
     "type": "git",
