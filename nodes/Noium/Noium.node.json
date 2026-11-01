@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-noium",
+	"node": "n8n-nodes-noium.noium",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Finance & Accounting", "Productivity"],
