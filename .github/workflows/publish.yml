@@ -82,7 +82,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          # Pinned: on Node 26 (lts/* since late October 2026) `npm ci` fails building isolated-vm,
+          # a native dependency of @n8n/node-cli. n8n itself runs on Node 24.
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
