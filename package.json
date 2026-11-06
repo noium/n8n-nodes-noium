@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-noium",
   "version": "2.1.0",
-  "description": "n8n community node for Noium: upload documents and get them back with their files",
+  "description": "n8n community nodes for Noium: documents, invoices, conversations, clients, counterparties, goods and services, and a trigger for Noium events",
   "license": "MIT",
   "homepage": "https://github.com/noium/n8n-nodes-noium#readme",
   "keywords": [
@@ -38,7 +38,8 @@
       "dist/credentials/NoiumApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Noium/Noium.node.js"
+      "dist/nodes/Noium/Noium.node.js",
+      "dist/nodes/NoiumTrigger/NoiumTrigger.node.js"
     ]
   },
   "devDependencies": {
