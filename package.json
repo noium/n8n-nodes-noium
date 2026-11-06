@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-noium",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "n8n community nodes for Noium: documents, invoices, conversations, clients, counterparties, goods and services, and a trigger for Noium events",
   "license": "MIT",
   "homepage": "https://github.com/noium/n8n-nodes-noium#readme",
