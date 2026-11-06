@@ -1,4 +1,15 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeProperties,
+	JsonObject,
+} from 'n8n-workflow';
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+
+import { buildMultipartBody, noiumApiRequest } from '../GenericFunctions';
+import type { NoiumOperation } from './common';
+import { getPathId } from './common';
 
 const showForUpload = { resource: ['document'], operation: ['upload'] };
 const showForGet = { resource: ['document'], operation: ['get'] };
@@ -153,3 +164,147 @@ export const documentFields: INodeProperties[] = [
 		hint: 'The name of the output binary field to put the file in',
 	},
 ];
+
+type UploadAdditionalFields = { type?: string; category?: string; fileName?: string };
+
+// n8n's own missing-binary error doesn't say which binary fields the item does have, and those
+// names are what a user needs to set Input Binary Field right (email triggers use attachment_0, …).
+function assertInputFile(
+	this: IExecuteFunctions,
+	itemIndex: number,
+	binaryPropertyName: string,
+): void {
+	if (!binaryPropertyName) {
+		throw new NodeOperationError(this.getNode(), 'Input Binary Field must not be empty', {
+			itemIndex,
+			description:
+				'Set it to the name of the input binary field that holds the file, usually "data".',
+		});
+	}
+
+	const binaryFields = Object.keys(this.getInputData()[itemIndex]?.binary ?? {});
+	if (binaryFields.includes(binaryPropertyName)) return;
+
+	if (binaryFields.length === 0) {
+		throw new NodeOperationError(
+			this.getNode(),
+			'No file to upload: the input item has no binary data',
+			{
+				itemIndex,
+				description:
+					'Put a node that outputs a file before this one, e.g. HTTP Request with Response Format set to File, Read/Write Files from Disk, Google Drive → Download, or an email trigger that downloads attachments.',
+			},
+		);
+	}
+
+	throw new NodeOperationError(
+		this.getNode(),
+		`No file to upload: the input item has no binary field "${binaryPropertyName}"`,
+		{
+			itemIndex,
+			description: `The item's binary fields are ${binaryFields.map((field) => `"${field}"`).join(', ')}. Set Input Binary Field to the one that holds the file.`,
+		},
+	);
+}
+
+async function uploadDocument(
+	this: IExecuteFunctions,
+	itemIndex: number,
+): Promise<INodeExecutionData[]> {
+	// An expression can resolve to nothing; that reads as an empty field, not a crash.
+	const binaryPropertyName = String(
+		this.getNodeParameter('binaryPropertyName', itemIndex) ?? '',
+	).trim();
+	const { type, category, fileName } = this.getNodeParameter(
+		'additionalFields',
+		itemIndex,
+	) as UploadAdditionalFields;
+
+	assertInputFile.call(this, itemIndex, binaryPropertyName);
+	const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName);
+	const content = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
+	if (content.length === 0) {
+		throw new NodeOperationError(
+			this.getNode(),
+			`The file in input binary field "${binaryPropertyName}" is empty`,
+			{ itemIndex, description: 'Noium only accepts files with content.' },
+		);
+	}
+
+	const fields: Record<string, string> = {};
+	if (type) fields.type = type;
+	if (category) fields.category = category;
+
+	const { body, contentType } = buildMultipartBody(fields, {
+		fieldName: 'file',
+		fileName: fileName || binaryData.fileName || 'document',
+		mimeType: binaryData.mimeType || 'application/octet-stream',
+		content,
+	});
+
+	const document = await noiumApiRequest.call(
+		this,
+		{ method: 'POST', path: '/v1/documents', body, headers: { 'Content-Type': contentType } },
+		itemIndex,
+	);
+
+	return [{ json: document, pairedItem: { item: itemIndex } }];
+}
+
+// The download URL is pre-signed by Noium's file storage, so it is fetched without the API key.
+async function downloadDocumentFile(
+	this: IExecuteFunctions,
+	document: IDataObject,
+	itemIndex: number,
+): Promise<Buffer> {
+	try {
+		const file = (await this.helpers.httpRequest({
+			method: 'GET',
+			url: document.downloadUrl as string,
+			encoding: 'arraybuffer',
+		})) as ArrayBuffer;
+		return Buffer.from(file);
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as JsonObject, {
+			itemIndex,
+			message: "Could not download the document's file",
+		});
+	}
+}
+
+async function getDocument(
+	this: IExecuteFunctions,
+	itemIndex: number,
+): Promise<INodeExecutionData[]> {
+	const documentId = getPathId.call(this, 'documentId', 'Document ID', itemIndex);
+	const document = await noiumApiRequest.call(
+		this,
+		{ method: 'GET', path: `/v1/documents/${documentId}` },
+		itemIndex,
+	);
+
+	if (!(this.getNodeParameter('download', itemIndex) as boolean)) {
+		return [{ json: document, pairedItem: { item: itemIndex } }];
+	}
+
+	const binaryPropertyName = this.getNodeParameter('binaryPropertyName', itemIndex) as string;
+	const content = await downloadDocumentFile.call(this, document, itemIndex);
+	const binaryData = await this.helpers.prepareBinaryData(
+		content,
+		(document.originalFilename as string | null) ?? (document.name as string),
+		(document.mimeType as string | null) ?? undefined,
+	);
+
+	return [
+		{
+			json: document,
+			binary: { [binaryPropertyName]: binaryData },
+			pairedItem: { item: itemIndex },
+		},
+	];
+}
+
+export const documentActions: Record<string, NoiumOperation> = {
+	upload: uploadDocument,
+	get: getDocument,
+};

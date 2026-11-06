@@ -1,7 +1,8 @@
-import { randomBytes } from 'crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 import type {
 	IDataObject,
 	IExecuteFunctions,
+	IHookFunctions,
 	IHttpRequestOptions,
 	IN8nHttpFullResponse,
 	JsonObject,
@@ -31,9 +32,9 @@ const ERROR_HINTS: Record<number, string> = {
  * Noium's `{ error: { code, message, details } }` envelope and are rethrown as a NodeApiError.
  */
 export async function noiumApiRequest(
-	this: IExecuteFunctions,
+	this: IExecuteFunctions | IHookFunctions,
 	options: Omit<IHttpRequestOptions, 'url'> & { path: string },
-	itemIndex: number,
+	itemIndex?: number,
 ): Promise<IDataObject> {
 	const credentials = await this.getCredentials<{ baseUrl?: string }>('noiumApi', itemIndex);
 	const baseUrl = (credentials.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '');
@@ -69,6 +70,76 @@ export async function noiumApiRequest(
 		httpCode: String(response.statusCode),
 		message: details ? `${message} (${details})` : message,
 		description: [ERROR_HINTS[response.statusCode], code].filter(Boolean).join(' ') || undefined,
+	});
+}
+
+export const isNotFoundError = (error: unknown) =>
+	error instanceof NodeApiError && error.httpCode === '404';
+
+/**
+ * Reads a `{ data, total, limit, offset }` list endpoint page by page (`limit`/`offset` query) until
+ * everything matching, or `limit` items, has been read.
+ */
+export async function noiumApiRequestAllItems(
+	this: IExecuteFunctions,
+	path: string,
+	query: IDataObject,
+	itemIndex: number,
+	{ returnAll, limit, maxPageSize }: { returnAll: boolean; limit: number; maxPageSize: number },
+): Promise<IDataObject[]> {
+	const results: IDataObject[] = [];
+	let offset = 0;
+
+	while (returnAll || results.length < limit) {
+		const pageSize = returnAll ? maxPageSize : Math.min(maxPageSize, limit - results.length);
+		const page = (await noiumApiRequest.call(
+			this,
+			{ method: 'GET', path, qs: { ...query, limit: pageSize, offset } },
+			itemIndex,
+		)) as { data?: IDataObject[]; total?: number };
+		const data = page.data ?? [];
+
+		results.push(...data);
+		offset += data.length;
+		if (data.length < pageSize || (page.total !== undefined && offset >= page.total)) break;
+	}
+
+	return results;
+}
+
+// How far a webhook's timestamp may be from now, as Standard Webhooks libraries allow.
+const WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS = 5 * 60;
+
+/**
+ * Verifies a Standard Webhooks request (https://www.standardwebhooks.com), as Noium signs them:
+ * `webhook-signature` holds space-separated `v1,<base64 HMAC-SHA256 of "id.timestamp.body">`
+ * entries (two during a secret rotation), keyed with the base64 part of the `whsec_…` secret.
+ */
+export function isValidWebhookSignature(
+	secret: string,
+	headers: { id?: string; timestamp?: string; signature?: string },
+	body: Buffer | string,
+	nowSeconds = Math.floor(Date.now() / 1000),
+): boolean {
+	const { id, timestamp, signature } = headers;
+	if (!id || !timestamp || !signature) return false;
+
+	const sentAt = Number(timestamp);
+	if (
+		!Number.isInteger(sentAt) ||
+		Math.abs(nowSeconds - sentAt) > WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS
+	) {
+		return false;
+	}
+
+	const key = Buffer.from(secret.replace(/^whsec_/, ''), 'base64');
+	const expected = createHmac('sha256', key).update(`${id}.${timestamp}.`).update(body).digest();
+
+	return signature.split(' ').some((entry) => {
+		const [version, value] = entry.split(',');
+		if (version !== 'v1' || !value) return false;
+		const received = Buffer.from(value, 'base64');
+		return received.length === expected.length && timingSafeEqual(received, expected);
 	});
 }
 

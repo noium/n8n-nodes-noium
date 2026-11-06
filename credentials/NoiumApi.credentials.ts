@@ -27,7 +27,7 @@ export class NoiumApi implements ICredentialType {
 			required: true,
 			default: '',
 			description:
-				'Create a key in Noium under Organization settings → API keys. Give it the documents:upload and documents:get scopes, plus organization:get to test the connection.',
+				'Create a key in Noium under Organization settings → API keys. Give it the scopes of the operations you use (listed in the node’s README), plus organization:get to test the connection.',
 		},
 		{
 			displayName: 'Base URL',
